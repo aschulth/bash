@@ -8,6 +8,13 @@
 #
 # Input: int > 0
 # Output: Collatz sequence.
+#
+# To test a range of integers [x,y], do, e.g.:
+# - for i in {x..y}; do echo "$i: "; ./collatz.sh $1 | tail -n1; done
+# To print the length of the sequence for a range of integers [x,y], do:
+# - for i in {x..y}; do echo "$i: "; ./collatz.sh $1 | wc -l; done
+# To find the longest sequence in a range of integers [x,y]; do:
+# - for i in {x..y}; do echo "$i: "; ./collatz.sh $1 | wc -l; done | sort -t' ' -k2 -n | tail -n1
 readonly SCRIPT=${0##*/}
 
 function logf() {
@@ -50,20 +57,20 @@ function times_three_plus_one() {
   echo "$(( 3 * $1 + 1 ))"
 }
 
-function sequence() {
+function calculate_sequence() {
   ( [[ -z $1 || $1 -eq 0 ]] || ! is_int $1 ) && return 1
   
   echo $1 && [[ $1 -eq 1 ]] && return
   
   is_even $1 \
-  && sequence $(divide_by_two $1) \
-  || sequence $(times_three_plus_one $1)
+  && calculate_sequence $(divide_by_two $1) \
+  || calculate_sequence $(times_three_plus_one $1)
 }
 
 main() {
   [[ $1 =~ ^-h$ ]] && usage && return
   
-  if ! sequence $1; then
+  if ! calculate_sequence $1; then
     logf "Invalid input format! Want: int > 0, have: '$1'!"
     exit 1
   fi
